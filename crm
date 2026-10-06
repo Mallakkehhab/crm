@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marwan Ashour | The Expertise House</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+:root{--bg:#eef2f7;--tx:#1e293b;--mut:#64748b;--pri:#0f2a43;--acc:#c9a24b;--bd:#e2e8f0;--red:#dc2626;--sh:0 1px 2px rgba(15,42,67,.06),0 6px 20px rgba(15,42,67,.06)}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+body:has(#login:not(.hide)){background:linear-gradient(135deg,#0f2a43,#1d4468 60%,#27567f);min-height:100vh}
+header{background:linear-gradient(135deg,#0f2a43,#1d4468);color:#fff;padding:12px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:3px solid var(--acc);position:sticky;top:0;z-index:10;box-shadow:0 4px 14px rgba(15,42,67,.25)}
+header h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.3px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button,.btn{border:0;border-radius:9px;padding:8px 14px;cursor:pointer;font:inherit;font-weight:600;background:var(--pri);color:#fff;transition:.15s}
+button:hover{filter:brightness(1.15);transform:translateY(-1px)}
+nav button{background:rgba(255,255,255,.1);padding:6px 12px;font-size:13px;font-weight:400}
+nav button:hover{background:rgba(255,255,255,.2)}
+nav button.on{background:var(--acc);color:#0f2a43;font-weight:700}
+main{max-width:1250px;margin:22px auto;padding:0 14px}
+.card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--sh);border:1px solid var(--bd);margin-bottom:16px}
+.card h3{margin:0 0 14px;font-size:17px;color:var(--pri)}
+.stats,.home{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}.stats .card{margin:0}
+.stat{border-right:4px solid var(--acc)}.stat b{display:block;font-size:30px;color:var(--pri);line-height:1.2}.stat span{color:var(--mut);font-size:13px}
+.card.big{cursor:pointer;text-align:center;padding:38px 12px;font-size:21px;font-weight:700;color:#fff;background:linear-gradient(135deg,#0f2a43,#1d4468);border:0;margin:0;transition:.2s}
+.card.big:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,42,67,.3)}
+.big small{display:block;font-weight:400;font-size:13px;color:#cbd5e1;margin-top:8px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;background:#fff;transition:.15s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--acc);box-shadow:0 0 0 3px rgba(201,162,75,.25)}
+.bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}.bar>*{width:auto;flex:0 1 150px}.bar #q{flex:1 1 200px}
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:11px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
+th{background:#f8fafc;color:var(--mut);font-weight:700;font-size:12px;position:sticky;top:0}
+tr:last-child td{border-bottom:0}tbody tr:hover td,table tr:hover td{background:#f8fafc}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:7px;vertical-align:middle;box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+.sm{padding:4px 10px;font-size:12px;border-radius:7px}
+.del{background:var(--red)}.ed{background:#475569}.xl{background:#15803d}
+dialog{border:0;border-radius:16px;padding:22px;width:min(540px,94vw);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(15,42,67,.35)}
+dialog::backdrop{background:rgba(15,42,67,.55);backdrop-filter:blur(3px)}
+dialog h3{margin:0 0 6px;color:var(--pri);font-size:18px;padding-bottom:10px;border-bottom:2px solid var(--acc)}
+label{display:block;font-size:12.5px;color:var(--mut);margin:11px 0 4px;font-weight:600}
+#login{max-width:370px;margin:12vh auto;padding:30px;border:0;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+#login h2{margin:0 0 18px;line-height:1.4}#login small{color:var(--acc);font-size:14px;letter-spacing:1px}
+.hide{display:none!important}.err{color:var(--red);font-size:13px;margin-top:10px;text-align:center}
+.nt{border-bottom:1px solid var(--bd);padding:9px 0;font-size:13px}.nt i{color:var(--mut);font-size:12px}.rm{color:#b45309;font-weight:600}
+::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+@media(max-width:640px){header{padding:10px 12px}nav{overflow-x:auto;flex-wrap:nowrap;width:100%;padding-bottom:4px}nav button{white-space:nowrap}main{margin:14px auto}}
+</style>
+</head>
+<body>
+<div id="eb" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;font-size:13px;direction:ltr;text-align:left"></div>
+<div id="login" class="card hide">
+  <h2 style="text-align:center;color:var(--pri)">Marwan Ashour<br><small>The Expertise House</small></h2>
+  <label>اسم المستخدم</label><input id="em" type="text" autocomplete="username" autocapitalize="none">
+  <label>كلمة المرور</label><input id="pw" type="password">
+  <button class="btn" style="width:100%;margin-top:14px" onclick="login()">دخول</button><div id="lerr" class="err"></div>
+</div>
+<div id="app" class="hide">
+  <header><h1>Marwan Ashour | The Expertise House</h1>
+    <nav>
+      <button data-t="dash" class="on">الرئيسية</button>
+      <button data-t="properties">🏠 العقارات</button>
+      <button data-t="clients">عملاء العقار</button>
+      <button data-t="eng_clients">🏗️ الهندسة</button>
+      <button data-t="rem">🔔 التذكيرات</button>
+      <button data-t="rep">📊 تقرير اليوم</button>
+      <button data-t="employees">👥 الموظفون</button>
+      <button onclick="logout()">خروج</button>
+    </nav></header>
+  <main id="view"></main>
+</div>
+<dialog id="dlg"><form id="frm" method="dialog"></form></dialog>
+<input type="file" id="xf" accept=".xlsx,.xls,.csv" class="hide">
+
+<script>
+window.onerror=(m)=>{const e=document.getElementById("eb");e.style.display="block";e.textContent="Error: "+m;};
+window.onunhandledrejection=(ev)=>window.onerror(ev.reason&&ev.reason.message||ev.reason);
+// ====== ضعي بيانات مشروعك هنا ======
+const SUPABASE_URL = 'https://yzcgghgjlthadgvbmllz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6Y2dnaGdqbHRoYWRndmJtbGx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyNzIzMzksImV4cCI6MjEwNjg0ODMzOX0.pVmth5P5glMYMhPabH5RtKyLApedEtMBsPeTP1K3flw';
+// ====================================
+const DOMAIN = '@expertise-house.com';
+const un = e => String(e||'').replace(DOMAIN,'');
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today = () => new Date().toISOString().slice(0,10);
+const STS = {g:['Active','متاح','تم التعاقد','Contract','تم البيع','تم التأجير'], r:['Stopped','مرفوض'],
+  y:['Follow-up','متابعة','معاينة','محجوز','جديد','Lead','Qualified','Documents Received','Proposal','Negotiation']};
+const col = v => STS.g.includes(v)?'#16a34a':STS.r.includes(v)?'#dc2626':STS.y.includes(v)?'#eab308':'#9ca3af';
+const SRC = ['فيسبوك','واتساب','إعلان','ترشيح','زيارة مباشرة','أخرى'];
+const CFG = {
+ properties:{label:'العقارات',add:'عقار جديد',fields:[
+  {k:'seq',l:'#',ro:1},{k:'status',l:'الحالة',o:['Active','Follow-up','Stopped'],f:1},
+  {k:'owner_name',l:'اسم المالك',req:1},{k:'phone',l:'الهاتف'},{k:'phone2',l:'هاتف إضافي',x:1},
+  {k:'type',l:'النوع',o:['شقة','فيلا','دوبلكس','أرض','محل','مكتب'],f:1},
+  {k:'deal',l:'نوع الصفقة',o:['Sale','Resale','Rental'],f:1},
+  {k:'city',l:'المدينة',f:1},{k:'area',l:'المنطقة',f:1},{k:'compound',l:'Compound',f:1},
+  {k:'building',l:'المبنى/المرحلة',x:1},{k:'unit_no',l:'رقم الوحدة',x:1},
+  {k:'size',l:'المساحة (م²)',t:'number',r:1},{k:'bedrooms',l:'غرف النوم',t:'number',f:1},{k:'bathrooms',l:'الحمامات',t:'number',x:1},
+  {k:'floor',l:'الدور',x:1},{k:'finishing',l:'التشطيب',o:['سوبر لوكس','لوكس','نصف تشطيب','بدون تشطيب'],x:1},
+  {k:'furnished',l:'مفروش',o:['غير مفروش','مفروش'],x:1},
+  {k:'price',l:'السعر',t:'number',r:1},{k:'rent_price',l:'سعر الإيجار',t:'number',x:1},{k:'payment',l:'طريقة السداد',x:1},
+  {k:'source',l:'المصدر',o:SRC,x:1},{k:'assigned_to',l:'الموظف',o:'emp',f:1},{k:'notes',l:'ملاحظات',t:'textarea',x:1}]},
+ clients:{label:'عملاء العقار',add:'عميل جديد',fields:[
+  {k:'name',l:'الاسم',req:1},{k:'phone',l:'الهاتف'},{k:'email',l:'الإيميل',t:'email',x:1},{k:'budget',l:'الميزانية',t:'number',r:1},
+  {k:'status',l:'الحالة',o:['جديد','متابعة','معاينة','تم التعاقد','مرفوض'],f:1},{k:'source',l:'المصدر',o:SRC,f:1},
+  {k:'assigned_to',l:'الموظف',o:'emp',f:1},{k:'notes',l:'ملاحظات',t:'textarea',x:1}]},
+ eng_clients:{label:'عملاء الهندسة',add:'عميل هندسي جديد',fields:[
+  {k:'name',l:'اسم العميل',req:1},{k:'country',l:'الدولة',o:['Egypt','Saudi Arabia','UAE','Kuwait','Yemen','Other'],f:1},
+  {k:'status',l:'المرحلة',o:['Lead','Qualified','Documents Received','Proposal','Negotiation','Contract'],f:1},
+  {k:'mobile',l:'الموبايل'},{k:'service',l:'الخدمة المطلوبة'},{k:'city',l:'المدينة',x:1},{k:'whatsapp',l:'واتساب',x:1},
+  {k:'email',l:'الإيميل',t:'email',x:1},{k:'location',l:'موقع المشروع',x:1},{k:'project_type',l:'نوع المشروع',x:1},
+  {k:'land_area',l:'مساحة الأرض',t:'number',x:1},{k:'build_area',l:'مساحة البناء',t:'number',x:1},{k:'source',l:'المصدر',x:1},
+  {k:'assigned_to',l:'الموظف',o:'emp',f:1},{k:'next_followup',l:'المتابعة القادمة',t:'date'},{k:'notes',l:'ملاحظات',t:'textarea',x:1}]},
+ employees:{label:'الموظفون',add:'موظف جديد',nf:1,fields:[
+  {k:'name',l:'الاسم',req:1},{k:'phone',l:'الهاتف'},{k:'job',l:'الوظيفة'},{k:'role',l:'الصلاحية',o:['موظف','مدير']},{k:'email',l:'الإيميل (للدخول)'}]}
+};
+let cache={}, FL={}, EMP=[], ME='';
+
+async function init(){ try{ const {data:{session}}=await sb.auth.getSession(); show(!!session); }catch(e){ show(false); } }
+async function show(ok){
+  $('#login').classList.toggle('hide',ok); $('#app').classList.toggle('hide',!ok);
+  if(ok){ ME=(await sb.auth.getSession()).data.session.user.email; await loadEmp(); go('dash'); }
+}
+async function loadEmp(){ const r=await sb.from('employees').select('name'); EMP=(r.data||[]).map(x=>x.name); }
+async function login(){
+  const u=$('#em').value.trim().toLowerCase();
+  const {error}=await sb.auth.signInWithPassword({email:u.includes('@')?u:u+DOMAIN,password:$('#pw').value});
+  error ? $('#lerr').textContent='بيانات الدخول غير صحيحة' : show(true);
+}
+async function logout(){ await sb.auth.signOut(); show(false); }
+document.querySelectorAll('nav [data-t]').forEach(b=>b.onclick=()=>go(b.dataset.t));
+async function go(t){
+  document.querySelectorAll('nav [data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  ({dash,rem,rep}[t]||(()=>list(t)))();
+}
+const cnt = async (t,q)=>{ let r=sb.from(t).select('id',{count:'exact',head:true}); if(q) r=q(r); return (await r).count||0; };
+const nm = r => r.name||r.owner_name||('#'+(r.seq||''));
+
+async function dash(){
+  const [p,c,e,r]=await Promise.all([cnt('properties'),cnt('clients'),cnt('eng_clients'),
+    cnt('notes',q=>q.lte('remind_at',today()).eq('done',false))]);
+  $('#view').innerHTML=`<div class="home">
+   <div class="card big" onclick="go('properties')">🏠 CRM العقار<small>عقارات وعملاء</small></div>
+   <div class="card big" onclick="go('eng_clients')">🏗️ CRM الهندسة<small>عملاء ومشاريع</small></div></div>
+   <div class="stats"><div class="card stat"><b>${p}</b><span>عقارات</span></div><div class="card stat"><b>${c}</b><span>عملاء العقار</span></div>
+   <div class="card stat"><b>${e}</b><span>عملاء الهندسة</span></div><div class="card stat"><b>${r}</b><span>تذكيرات مستحقة</span></div></div>`;
+}
+
+async function list(t){
+  const {data,error}=await sb.from(t).select('*').order('created_at',{ascending:false}).limit(5000);
+  if(error){ $('#view').innerHTML=`<div class="card err">${esc(error.message)}</div>`; return; }
+  cache[t]=data; FL={}; if(t==='employees') loadEmp();
+  const C=CFG[t];
+  const fl=C.fields.filter(f=>f.f).map(f=>{
+    const op=Array.isArray(f.o)?f.o:[...new Set(data.map(r=>r[f.k]).filter(v=>v!=null&&v!==''))];
+    return `<select data-k="${f.k}"><option value="">${f.l}: الكل</option>${op.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;}).join('');
+  const rg=C.fields.filter(f=>f.r).map(f=>`<input type="number" data-r="${f.k}_min" placeholder="${f.l} من"><input type="number" data-r="${f.k}_max" placeholder="${f.l} إلى">`).join('');
+  $('#view').innerHTML=`<div class="card"><div class="bar"><button class="btn" onclick="openForm('${t}')">+ ${C.add}</button>
+   <button class="btn xl" onclick="xexp('${t}')">⬇ تصدير Excel</button><button class="btn xl" onclick="ximp('${t}')">⬆ استيراد Excel</button>
+   <button class="btn ed" onclick="xtpl('${t}')">قالب Excel</button></div>
+   <div class="bar"><input id="q" placeholder="بحث...">${fl}${rg}</div><div id="cnt" style="color:var(--mut);font-size:12px;margin-bottom:6px"></div>
+   <div class="tw"><table id="tb"></table></div></div>`;
+  document.querySelectorAll('.bar [data-k],.bar [data-r],#q').forEach(i=>i.oninput=()=>{
+    FL[i.dataset.k||i.dataset.r||'q']=i.value; draw(t); });
+  draw(t);
+}
+function filt(t){
+  const q=(FL.q||'').toLowerCase();
+  return cache[t].filter(r=>{
+    if(q && !JSON.stringify(Object.values(r)).toLowerCase().includes(q)) return false;
+    return CFG[t].fields.every(f=>{
+      if(f.f && FL[f.k] && String(r[f.k])!==FL[f.k]) return false;
+      if(f.r){ const v=Number(r[f.k]), a=FL[f.k+'_min'], b=FL[f.k+'_max'];
+        if(a && !(v>=Number(a))) return false; if(b && !(v<=Number(b))) return false; }
+      return true; });
+  });
+}
+function draw(t){
+  const C=CFG[t], cols=C.fields.filter(f=>!f.x), rows=filt(t);
+  $('#cnt').textContent=rows.length+' نتيجة';
+  $('#tb').innerHTML=`<tr>${cols.map(f=>`<th>${f.l}</th>`).join('')}<th></th></tr>`+
+   (rows.map(r=>`<tr>${cols.map(f=>`<td>${f.k==='status'?`<span class="dot" style="background:${col(r.status)}"></span>${esc(r.status)}`:esc(r[f.k])}</td>`).join('')}
+   <td>${C.nf?'':`<button class="btn sm ed" onclick="notes('${t}','${r.id}')">📝</button> <button class="btn sm ed" onclick="files('${t}','${r.id}')">📎</button> `}
+   <button class="btn sm ed" onclick="openForm('${t}','${r.id}')">تعديل</button> <button class="btn sm del" onclick="del('${t}','${r.id}')">حذف</button></td></tr>`).join('')
+   ||`<tr><td colspan="30" style="text-align:center;color:var(--mut)">لا توجد بيانات</td></tr>`);
+}
+
+function openForm(t,id){
+  const row=id?cache[t].find(r=>r.id===id):{};
+  $('#frm').innerHTML=`<h3>${id?'تعديل':CFG[t].add}</h3>`+CFG[t].fields.filter(f=>!f.ro).map(f=>{
+    const v=esc(row[f.k]), op=f.o==='emp'?['',...EMP]:f.o;
+    const inp=op?`<select name="${f.k}">${op.map(o=>`<option ${row[f.k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`
+     :f.t==='textarea'?`<textarea name="${f.k}" rows="3">${v}</textarea>`
+     :`<input name="${f.k}" type="${f.t||'text'}" ${f.t==='number'?'step="any"':''} value="${v}" ${f.req?'required':''}>`;
+    return `<label>${f.l}</label>${inp}`;}).join('')+
+   `<div style="display:flex;gap:8px;margin-top:14px"><button class="btn">حفظ</button><button class="btn ed" type="button" onclick="$('#dlg').close()">إلغاء</button></div>`;
+  $('#frm').onsubmit=async e=>{
+    e.preventDefault(); const fd=new FormData($('#frm')), o={};
+    CFG[t].fields.filter(f=>!f.ro).forEach(f=>{ const v=fd.get(f.k);
+      o[f.k]=(f.t==='number'||f.t==='date')&&v===''?null:f.t==='number'?Number(v):v; });
+    const r=id?await sb.from(t).update(o).eq('id',id):await sb.from(t).insert(o);
+    if(r.error) return alert(r.error.message); $('#dlg').close(); list(t); };
+  $('#dlg').showModal();
+}
+async function del(t,id){
+  if(!confirm('متأكدة من الحذف؟')) return;
+  const {error}=await sb.from(t).delete().eq('id',id);
+  if(error) return alert(error.message); await sb.from('notes').delete().eq('ref_id',id); list(t);
+}
+
+/* ===== Excel ===== */
+function xexp(t){
+  const C=CFG[t], rows=filt(t).map(r=>Object.fromEntries(C.fields.map(f=>[f.l,r[f.k]])));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'data');
+  XLSX.writeFile(wb,`${t}-${today()}.xlsx`);
+}
+function xtpl(t){
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([CFG[t].fields.filter(f=>!f.ro).map(f=>f.l)]),'data');
+  XLSX.writeFile(wb,`template-${t}.xlsx`);
+}
+function ximp(t){
+  const inp=$('#xf'); inp.value='';
+  inp.onchange=async()=>{
+    const file=inp.files[0]; if(!file) return;
+    const wb=XLSX.read(await file.arrayBuffer()), rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:null});
+    const F=CFG[t].fields, map={}; F.forEach(f=>map[f.l]=f);
+    const out=rows.map(r=>{ const o={};
+      for(const h in r){ const f=map[String(h).trim()], v=r[h]; if(!f||f.ro||v===null||v==='') continue;
+        if(f.t==='number'){ const n=Number(v); if(!isNaN(n)) o[f.k]=n; }
+        else if(f.t==='date'&&typeof v==='number') o[f.k]=new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10);
+        else o[f.k]=String(v); }
+      return o; }).filter(o=>F.filter(f=>f.req).every(f=>o[f.k]));
+    if(!out.length) return alert('لم يتم العثور على صفوف صالحة. استخدمي "قالب Excel" لنفس أسماء الأعمدة.');
+    if(!confirm(`سيتم استيراد ${out.length} صف. متابعة؟`)) return;
+    for(let i=0;i<out.length;i+=200){ const {error}=await sb.from(t).insert(out.slice(i,i+200)); if(error) return alert(error.message); }
+    alert('تم الاستيراد ✅'); list(t);
+  };
+  inp.click();
+}
+
+/* ===== Notes + Reminders ===== */
+async function notes(t,id){
+  const r=cache[t].find(x=>x.id===id);
+  const {data}=await sb.from('notes').select('*').eq('ref_id',id).order('created_at',{ascending:false});
+  $('#frm').onsubmit=e=>e.preventDefault();
+  $('#frm').innerHTML=`<h3>ملاحظات: ${esc(nm(r))}</h3><div>${(data||[]).map(n=>`<div class="nt">${esc(n.body)}<br><i>${esc(un(n.created_by))} — ${n.created_at.slice(0,10)}</i>
+   ${n.remind_at?`<span class="rm"> 🔔 ${n.remind_at}${n.done?' ✔':''}</span>${n.done?'':` <button type="button" class="btn sm" onclick="done('${n.id}','${t}','${id}')">تمت</button>`}`:''}</div>`).join('')||'<p style="color:var(--mut)">لا توجد ملاحظات</p>'}</div>
+   <label>ملاحظة جديدة</label><textarea id="nb" rows="3"></textarea><label>تذكير بالمتابعة</label>
+   <div class="bar"><button type="button" class="btn sm ed" onclick="qd(1)">غدًا</button><button type="button" class="btn sm ed" onclick="qd(3)">بعد 3 أيام</button>
+   <button type="button" class="btn sm ed" onclick="qd(7)">بعد أسبوع</button><input type="date" id="nd"></div>
+   <div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="btn" onclick="addNote('${t}','${id}')">حفظ</button>
+   <button type="button" class="btn ed" onclick="$('#dlg').close()">إغلاق</button></div>`;
+  if(!$('#dlg').open) $('#dlg').showModal();
+}
+const qd=n=>$('#nd').value=new Date(Date.now()+n*864e5).toISOString().slice(0,10);
+async function addNote(t,id){
+  const body=$('#nb').value.trim(); if(!body) return;
+  const {error}=await sb.from('notes').insert({ref_table:t,ref_id:id,body,remind_at:$('#nd').value||null});
+  error?alert(error.message):notes(t,id);
+}
+async function done(nid,t,id){
+  await sb.from('notes').update({done:true,done_at:new Date().toISOString(),done_by:ME}).eq('id',nid);
+  t?notes(t,id):rem();
+}
+async function rem(){
+  const {data}=await sb.from('notes').select('*').lte('remind_at',today()).eq('done',false).order('remind_at');
+  const names={};
+  for(const t of ['properties','clients','eng_clients']){ const ids=(data||[]).filter(n=>n.ref_table===t).map(n=>n.ref_id);
+    if(ids.length) ((await sb.from(t).select('*').in('id',ids)).data||[]).forEach(r=>names[r.id]=nm(r)); }
+  $('#view').innerHTML=`<div class="card"><h3>🔔 متابعات اليوم والمتأخرة</h3><div class="tw"><table><tr><th>الموعد</th><th>القسم</th><th>الاسم</th><th>الملاحظة</th><th>الموظف</th><th></th></tr>`+
+   ((data||[]).map(n=>`<tr><td style="color:${n.remind_at<today()?'var(--red)':'inherit'}">${n.remind_at}</td><td>${CFG[n.ref_table].label}</td><td>${esc(names[n.ref_id])}</td>
+   <td style="white-space:normal">${esc(n.body)}</td><td>${esc(un(n.created_by))}</td><td><button class="btn sm" onclick="done('${n.id}')">تمت</button></td></tr>`).join('')||'<tr><td colspan="6">لا توجد متابعات 🎉</td></tr>')+`</table></div></div>`;
+}
+
+/* ===== Today report ===== */
+async function rep(){
+  const d=today(), S={};
+  const g=e=>S[e||'—']=S[e||'—']||{notes:0,done:0,added:0,late:0};
+  const [n,dn,lt]=await Promise.all([
+    sb.from('notes').select('created_by').gte('created_at',d), sb.from('notes').select('done_by').gte('done_at',d),
+    sb.from('notes').select('created_by').lt('remind_at',d).eq('done',false)]);
+  (n.data||[]).forEach(x=>g(x.created_by).notes++); (dn.data||[]).forEach(x=>g(x.done_by).done++); (lt.data||[]).forEach(x=>g(x.created_by).late++);
+  for(const t of ['properties','clients','eng_clients']) ((await sb.from(t).select('created_by').gte('created_at',d)).data||[]).forEach(x=>g(x.created_by).added++);
+  $('#view').innerHTML=`<div class="card"><h3>📊 تقرير اليوم — ${d}</h3><div class="tw"><table><tr><th>الموظف</th><th>سجلات أُضيفت</th><th>ملاحظات كُتبت</th><th>متابعات تمت</th><th>متابعات متأخرة</th></tr>`+
+   (Object.entries(S).map(([k,v])=>`<tr><td>${esc(un(k))}</td><td>${v.added}</td><td>${v.notes}</td><td>${v.done}</td><td style="color:${v.late?'var(--red)':'inherit'}">${v.late}</td></tr>`).join('')||'<tr><td colspan="5">لا نشاط اليوم</td></tr>')+`</table></div></div>`;
+}
+
+/* ===== Attachments ===== */
+async function files(t,id){
+  const p=`${t}/${id}`, {data,error}=await sb.storage.from('files').list(p);
+  $('#frm').onsubmit=e=>e.preventDefault();
+  $('#frm').innerHTML=`<h3>📎 المرفقات</h3>${error?`<div class="err">${esc(error.message)}</div>`:''}`+
+   ((data||[]).filter(f=>f.name!=='.emptyFolderPlaceholder').map(f=>`<div class="nt">${esc(f.name.replace(/^\d+_/,''))}
+   <button type="button" class="btn sm" onclick="ofile('${p}/${f.name}')">فتح</button>
+   <button type="button" class="btn sm del" onclick="dfile('${t}','${id}','${p}/${f.name}')">حذف</button></div>`).join('')||'<p style="color:var(--mut)">لا توجد مرفقات</p>')+
+   `<label>رفع ملفات (صور، PDF، DWG، Word، Excel، ZIP...)</label><input type="file" id="fu" multiple>
+   <div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="btn" onclick="upl('${t}','${id}')">رفع</button>
+   <button type="button" class="btn ed" onclick="$('#dlg').close()">إغلاق</button></div>`;
+  if(!$('#dlg').open) $('#dlg').showModal();
+}
+async function upl(t,id){
+  for(const f of $('#fu').files){
+    const {error}=await sb.storage.from('files').upload(`${t}/${id}/${Date.now()}_${f.name.replace(/[^\w.\-]/g,'_')}`,f);
+    if(error) alert(f.name+': '+error.message); }
+  files(t,id);
+}
+async function ofile(p){ const {data}=await sb.storage.from('files').createSignedUrl(p,3600); if(data) window.open(data.signedUrl,'_blank'); }
+async function dfile(t,id,p){ if(confirm('حذف الملف؟')){ await sb.storage.from('files').remove([p]); files(t,id); } }
+init();
+</script>
+</body>
+</html>
+
+[build]
+  publish = "."
